@@ -19,7 +19,7 @@ public class FieldSet extends StackPane {
 
         getStyleClass().add("bordered-titled-border");
         getChildren().addAll(title, contentPane);
-        getStylesheets().add(getClass().getResource("field_set.css").toExternalForm());
+        getStylesheets().add(getClass().getResource(TransaktionUi.SRC+"field_set.css").toExternalForm());
         setId("id-text");
 
     }

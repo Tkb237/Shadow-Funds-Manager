@@ -1,0 +1,63 @@
+.dialog-pane * {
+    -fx-text-fill: black;
+}
+
+.dialog-pane {
+    -fx-background-color: #f0f0f0;
+}
+
+.dialog-pane > *.button-bar > *.container {
+    -fx-background-color: #f0f0f0;
+}
+
+.dialog-pane > *.label.content {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane:header *.header-panel {
+    -fx-background-color: #e0e0e0;
+}
+
+.dialog-pane:header *.header-panel *.label {
+    -fx-font-size: 18px;
+    -fx-font-style: italic;
+}
+
+.button {
+    -fx-background-color: #7a42f4;
+}
+
+.button:hover
+{
+    -fx-background-color: #a066ff;
+    -fx-font-weight: bolder;
+}
+
+.dialog-pane .combo-box {
+    -fx-background-color: #f0f0f0; /* Dark background color */
+    -fx-text-fill: white; /* White text color */
+    -fx-border-color: #51158c; /* Purple border color */
+}
+
+.combo-box .arrow {
+    -fx-background-color: #51158c;
+    -fx-border-width: 2px; /* Purple background for arrow button */
+}
+
+.combo-box-popup .list-view {
+    -fx-control-inner-background: #f0f0f0; /* Dark background for dropdown list */
+    -fx-cell-hover-color: #7a42f4; /* Purple hover color for list items */
+    -fx-control-inner-background-alt: #f0f0f0; /* Alternative row background (same dark color) */
+    -fx-border-color: #7a42f4; /* Purple border color for the list */
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #f0f0f0; /* Dark background for list items */
+    -fx-text-fill: black; /* White text for list items */
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #7a42f4; /* Purple background on hover */
+    -fx-text-fill: black; /* White text color */
+}

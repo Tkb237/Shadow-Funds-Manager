@@ -3,7 +3,7 @@ package taskVerwaltung;
 import java.io.Serializable;
 import java.util.List;
 
-import geldVerwaltung.Prioritaet;
+import util.other.Prioritaet;
 
 public class Ziel extends Task implements Serializable {
 

@@ -1,0 +1,21 @@
+.label {
+    -fx-font: 17px Cambria;
+    -fx-font-weight: bolder;
+}
+
+.bordered-titled-title {
+    -fx-background-color: #e0e0e0;
+    -fx-translate-y: -13;
+}
+
+.bordered-titled-border {
+    -fx-content-display: top;
+    -fx-border-insets: 20 15 15 15;
+    -fx-background-color: transparent;
+    -fx-border-color: #5C007F;
+    -fx-border-width: 2px;
+}
+
+.bordered-titled-content {
+    -fx-padding: 20 10 10 10;
+}

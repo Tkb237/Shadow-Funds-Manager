@@ -153,7 +153,7 @@ public class TaskUi extends VBox {
             tasks.forEach(t ->
             {
                 if (t.getClass() == Ziel.class) {
-                    addZiele((Ziel) t, treeItem);
+                    addZiele(t, treeItem);
                 } else {
                     CheckBoxTreeItem<Task> taskItem = new CheckBoxTreeItem<Task>(t);
                     treeItem.getChildren().add(taskItem);
@@ -179,6 +179,7 @@ public class TaskUi extends VBox {
     }
 
     private void changeStateCheckedBoxItem(CheckBoxTreeItem<Task> item, Task t) {
+        // load the state of CheckBoxItem based on the value of a task
         if (t.isIndeterminate()) {
             item.setIndeterminate(true);
         } else {
@@ -186,20 +187,26 @@ public class TaskUi extends VBox {
         }
     }
 
-    private void addListenerToCheckBoxTreeItem(CheckBoxTreeItem<Task> item) {
-        //item.indeterminateProperty().addListener((prop, old, newV) -> fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE)));
+    private void addListenerToCheckBoxTreeItem(CheckBoxTreeItem<Task> item)
+    {
+        item.setSelected(true);
+        item.setSelected(false);
+        item.indeterminateProperty().addListener((obs, old, newValue) -> item.getValue().setIndeterminate(newValue));
         item.selectedProperty().addListener(new ChangeListener<Boolean>() {
-
             @Override
-            public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                CheckBoxTreeItem<Task> test = getSelectedItem();
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean old, Boolean newValue) {
+                CheckBoxTreeItem<Task> selectedItem = getSelectedItem();
                 fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE));
-                if (test != null) {
-                    getTaskInfoUI().updateProgressBar(test.getValue(), test);
-
+                item.getValue().setDone(newValue);
+                myTree.refresh();
+                if (selectedItem != null)
+                {
+                    getTaskInfoUI().updateProgressBar(selectedItem.getValue(), selectedItem);
+                    getTaskInfoUI().updateTitel(selectedItem);
                 }
             }
         });
+
     }
 
     public TaskInfoUI getTaskInfoUI() {
@@ -219,45 +226,32 @@ public class TaskUi extends VBox {
         taskInfoUI.setPfadCss(style);
     }
 
+    private void addListenerStateChanged(TreeItem<Task> item)
+    {
+        item.getChildren().addListener(new ListChangeListener<>() {
+            @Override
+            public void onChanged(Change<? extends TreeItem<Task>> changed) {
+                while (changed.next()) {
+                    if ((changed.wasAdded() || changed.wasUpdated() || changed.wasRemoved())) {
+                        fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE));
+                    }
+                }
+            }
+        });
+    }
 
     private void signalChanges(TreeItem<Task> item)
     {
         fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE));
-        item.getChildren().addListener(new ListChangeListener<TreeItem<Task>>() {
-            @Override
-            public void onChanged(Change<? extends TreeItem<Task>> changed) {
-                while (changed.next()) {
-                    if ((changed.wasAdded() || changed.wasUpdated() || changed.wasRemoved())) {
-                        fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE));
-                    }
-                }
-            }
-        });
+        addListenerStateChanged(item);
     }
 
-    private void rootListener()
-    {
-        myTree.getRoot().getChildren().addListener(new ListChangeListener<TreeItem<Task>>() {
-
-            @Override
-            public void onChanged(Change<? extends TreeItem<Task>> changed) {
-                while (changed.next()) {
-                    if ((changed.wasAdded() || changed.wasUpdated() || changed.wasRemoved())) {
-                        fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE));
-                    }
-                }
-            }
-        });
-    }
     private void signalChanges() {
         // fire an event if a change occurs in the list
         myTree.addEventHandler(StateChangedEvent.CHANGED_EVENT_TYPE, e ->
                 fireEvent(new StateChangedEvent(StateChangedEvent.CHANGED_EVENT_TYPE)));
-        rootListener();
-        myTree.rootProperty().addListener((prop, old, newValue) ->
-        {
-           rootListener();
-        });
+        addListenerStateChanged(myTree.getRoot());
+        myTree.rootProperty().addListener((prop, old, newValue) -> addListenerStateChanged(myTree.getRoot()));
 
     }
 }

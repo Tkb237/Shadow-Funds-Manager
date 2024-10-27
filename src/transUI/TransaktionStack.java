@@ -1,15 +1,15 @@
 package transUI;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import event.CusEventTable;
 import event.StateChangedEvent;
-import geldVerwaltung.Ausgabe;
 import geldVerwaltung.Eingabe;
 import geldVerwaltung.Konto;
-import geldVerwaltung.Prioritaet;
+import util.other.Prioritaet;
 import geldVerwaltung.Transaktion;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,23 +27,26 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import util.template.Template;
+
+import static util.template.Template.df;
 
 public class TransaktionStack extends StackPane {
     private String pfadCss = "light_theme.css";
-    private TableView<Transaktion> mainTab = new TableView<>();
+    private final TableView<Transaktion> mainTab = new TableView<>();
 
     private Konto myKonto;
 
-    private Button addButton = new Button("Do Transaction");
-    private Button removeButton = new Button("Undo Transaction");
-    private Button updateButton = new Button("Update Transaction");
+    private final Button addButton = new Button("Do Transaction");
+    private final Button removeButton = new Button("Undo Transaction");
+    private final Button updateButton = new Button("Update Transaction");
     // Radio buttons
-    private RadioButton schuldButton = new RadioButton("Schuld");
-    private RadioButton darlehenButton = new RadioButton("Darlehen");
-    private RadioButton eingabeButton = new RadioButton("Eingabe");
-    private RadioButton ausgabeButton = new RadioButton("Ausgabe");
+    private final RadioButton schuldButton = new RadioButton("Schuld");
+    private final RadioButton darlehenButton = new RadioButton("Darlehen");
+    private final RadioButton eingabeButton = new RadioButton("Eingabe");
+    private final RadioButton ausgabeButton = new RadioButton("Ausgabe");
 
-    private RadioButton allButton = new RadioButton("All");
+    private final RadioButton allButton = new RadioButton("All");
     protected boolean emitted = false;
 
     public TransaktionStack(Stage s, Konto k) {
@@ -94,14 +97,15 @@ public class TransaktionStack extends StackPane {
 
     private String getChoice() {
         try {
-            String[] IDs = (myKonto.getTransaktions().stream().map(t -> t.getiD()).toArray(String[]::new));
-            /*****************************************************************************************/
+            String[] IDs = (myKonto.getTransaktions().stream().map(Transaktion::getiD).toArray(String[]::new));
+            /* ****************************************************************************************/
             ChoiceDialog<String> diag = new ChoiceDialog<String>(IDs[0], IDs);
             String iconPfad = getClass().getClassLoader().getResource("icons8-select-64.png").toExternalForm();
             Stage stage = (Stage) diag.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(iconPfad));
-            diag.getDialogPane().getStylesheets().add(getClass().getResource(pfadCss.replace("_theme", "")).toExternalForm());
-            /*****************************************************************************************/
+            diag.getDialogPane().getStylesheets().add(getClass().getResource
+                    (TransaktionUi.SRC + pfadCss.replace("_theme", "")).toExternalForm());
+            /* ****************************************************************************************/
             Optional<String> result = diag.showAndWait();
             return result.orElse("1");
         } catch (Exception e) {
@@ -117,8 +121,9 @@ public class TransaktionStack extends StackPane {
                 {
                     int before = myKonto.getTransaktions().size();
                     showSecond(s, myKonto);
-                    if (before < myKonto.getTransaktions().size())
+                    if (before < myKonto.getTransaktions().size()) {
                         fireEvent(new CusEventTable(CusEventTable.ADD_EVENT_TYPE));
+                    }
                     // we should only fire the event if an element was added
                 }
 
@@ -136,7 +141,7 @@ public class TransaktionStack extends StackPane {
                 allButton.setSelected(true);
                 fireEvent(new CusEventTable(CusEventTable.REMOVE_EVENT_TYPE));
             }
-            if (myKonto.getTransaktions().size() <= 0) {
+            if (myKonto.getTransaktions().isEmpty()) {
                 CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
                 alert.setContentText("Keine Transaktion vorhanden");
                 alert.show();
@@ -158,7 +163,7 @@ public class TransaktionStack extends StackPane {
                 allButton.setSelected(true);
                 fireEvent(new CusEventTable(CusEventTable.UPDATE_EVENT_TYPE));
             }
-            if (myKonto.getTransaktions().size() <= 0) {
+            if (myKonto.getTransaktions().isEmpty()) {
                 CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
                 alert.setContentText("Keine Transaktion vorhanden");
                 alert.show();
@@ -172,8 +177,6 @@ public class TransaktionStack extends StackPane {
         TransaktionUi myUi = new TransaktionUi(s, k);
         myUi.custom(pfadCss);
         myUi.showAndWait();
-        //showAll(k.getTransaktions());
-        FXCollections.observableArrayList(myKonto.getTransaktions());
     }
 
     @SuppressWarnings("unchecked")
@@ -182,26 +185,24 @@ public class TransaktionStack extends StackPane {
         TableColumn<Transaktion, String> idColumn = new TableColumn<Transaktion, String>("ID");
         TableColumn<Transaktion, String> bezeichnungColumn = new TableColumn<Transaktion, String>("Bezeichnung");
         TableColumn<Transaktion, String> kategorieColumn = new TableColumn<Transaktion, String>("Kategorie");
-        TableColumn<Transaktion, Float> betragColumn = new TableColumn<Transaktion, Float>("Betrag");
+        TableColumn<Transaktion, String> betragColumn = new TableColumn<Transaktion, String>("Betrag");
         TableColumn<Transaktion, LocalDate> dateColumn = new TableColumn<Transaktion, LocalDate>("Datum");
         TableColumn<Transaktion, String> beschreibungColumn = new TableColumn<Transaktion, String>("Beschreibung");
         //
         idColumn.setMaxWidth(200);
         idColumn.setMinWidth(45);
         // Spalte mit einem Attribut verbinden
-
         beschreibungColumn.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getBeschreibung()));
         bezeichnungColumn.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getBezeichnung()));
         kategorieColumn.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getKategorie()));
-        betragColumn.setCellValueFactory(s -> new SimpleObjectProperty<Float>(s.getValue().getBetrag()));
+        betragColumn.setCellValueFactory(s -> new SimpleStringProperty(df.format(s.getValue().getBetrag()).
+                replace(".", ",") + " $"));
         dateColumn.setCellValueFactory(s -> new SimpleObjectProperty<LocalDate>(s.getValue().getDate()));
         idColumn.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getiD()));
 
         // sort id column
-        idColumn.setComparator((a, b) ->
-        {
-            return Integer.compare(Integer.parseInt(a.replace("Transaktion Nr: ", "")), Integer.parseInt(b.replace("Transaktion Nr: ", "")));
-        });
+        idColumn.setComparator(Comparator.comparingInt(a -> Integer.parseInt(a.replace("Transaktion Nr: ", ""))));
+        betragColumn.setComparator(Comparator.comparing(a -> Float.parseFloat(a.replace(",", ".").replace("$", ""))));
 
         //Spalten anfügen
         mainTab.getColumns().addAll(idColumn, bezeichnungColumn, kategorieColumn, betragColumn, dateColumn, beschreibungColumn);
@@ -230,21 +231,24 @@ public class TransaktionStack extends StackPane {
     private void showAusgabe() {
         showEingabe();
         ((TableColumn<Transaktion, String>) mainTab.getColumns().toArray()[1]).setText("Wozu ?");
-
+        ((TableColumn<Transaktion, String>) mainTab.getColumns().toArray()[4]).setText("Datum");
         TableColumn<Transaktion, Prioritaet> prioColumn = new TableColumn<Transaktion, Prioritaet>("Priorität");
-        prioColumn.setCellValueFactory(s -> new SimpleObjectProperty<Prioritaet>(((Ausgabe) s.getValue()).getPrio()));
+
         mainTab.getColumns().add(prioColumn);
+
         prioColumn.setMinWidth(80);
 
     }
 
     @SuppressWarnings("unchecked")
     private void showEingabe() {
-        mainTab.getColumns().clear();
-        mainTab.getItems().clear();
-        show();
-        ((TableColumn<Transaktion, String>) mainTab.getColumns().toArray()[1]).setText("Quelle");
+        if (mainTab.getColumns().size() == 7) {
+            mainTab.getColumns().remove(6);
+        }
 
+        mainTab.getItems().clear();
+        ((TableColumn<Transaktion, String>) mainTab.getColumns().toArray()[1]).setText("Quelle");
+        ((TableColumn<Transaktion, String>) mainTab.getColumns().toArray()[4]).setText("Datum");
     }
 
     @SuppressWarnings({"unchecked"})
@@ -257,9 +261,12 @@ public class TransaktionStack extends StackPane {
     }
 
     public void showAll(List<? extends Transaktion> list) {
-        mainTab.getColumns().clear();
+        if (mainTab.getColumns().size() == 7) {
+            mainTab.getColumns().remove(6);
+        }
+
+        if (mainTab.getColumns().toArray()[4] instanceof TableColumn<?, ?> t) t.setText("Datum");
         mainTab.getItems().clear();
-        show();
         list.forEach(s -> mainTab.getItems().add(s));
     }
 
@@ -281,17 +288,11 @@ public class TransaktionStack extends StackPane {
         this.myKonto = konto;
     }
 
-    public ObservableList<Transaktion> getTransaktions() {
-        // if the state change we can update the chart
-        return mainTab.getItems();
-    }
-
     public void setStyleTrUI(String file) {
         this.pfadCss = file;
     }
 
-    public void refreshTable() {
-        mainTab.refresh();
+    public void setEmitted(boolean emitted) {
+        this.emitted = emitted;
     }
-
 }

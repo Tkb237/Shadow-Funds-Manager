@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import geldVerwaltung.Prioritaet;;
+import util.other.Prioritaet;;
 
 public class Task implements Serializable {
     /**

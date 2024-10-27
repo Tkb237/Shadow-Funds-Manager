@@ -1,5 +1,7 @@
 package geldVerwaltung;
 
+import util.other.Prioritaet;
+
 import java.time.LocalDate;
 
 public class Ausgabe extends Eingabe {

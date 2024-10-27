@@ -1,11 +1,15 @@
 package transUI;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class CustomAlert extends Alert {
-    private static String currentStyle = "light.css";
 
     public CustomAlert(AlertType at, String style) {
         super(at);
@@ -26,11 +30,22 @@ public class CustomAlert extends Alert {
         }
         Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(getClass().getClassLoader().getResource(pfad).toExternalForm()));
-        this.getDialogPane().getStylesheets().add(getClass().getResource(style).toExternalForm());
-        currentStyle = style;
+        this.getDialogPane().getStylesheets().add(getClass().getResource(TransaktionUi.SRC+style).toExternalForm());
     }
 
-    public static String getCurrentStyle() {
-        return currentStyle;
+    public void  showTemp()
+    {
+        initModality(Modality.NONE);
+        show();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run()
+            {
+                Platform.runLater(CustomAlert.this::close);
+                timer.cancel();
+            }
+        }, 800);
+
     }
 }

@@ -1,12 +1,13 @@
 package taskUI;
 
 import event.StateChangedEvent;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.KeyCode;
 import taskVerwaltung.Task;
@@ -20,16 +21,12 @@ class CustomTreeCell extends CheckBoxTreeCell<Task> {
 
     public CustomTreeCell(TaskUi taskUi) {
         this.taskUi = taskUi;
-
-        //myContext.setStyle("-fx-background-color: red;");
-
         configMenuItem(this.taskUi);
-        setOnMousePressed(e ->
+        // send data to the "TaskInfoUI" if we click on a TreeItem
+        setOnMouseClicked(event  ->
         {
-            CheckBoxTreeItem<Task> it = (CheckBoxTreeItem<Task>) getTreeItem();
-            if (it != null) {
-                taskUi.getTaskInfoUI().getData(it.getValue(), it);
-            }
+            CheckBoxTreeItem<Task> item = (CheckBoxTreeItem<Task>) getTreeItem();
+            if(item != null) taskUi.getTaskInfoUI().setData(item.getValue(), item);
         });
     }
 
@@ -43,7 +40,6 @@ class CustomTreeCell extends CheckBoxTreeCell<Task> {
             CheckBoxTreeItem<Task>[] tasksItems = it.getChildren().stream().map(s -> (CheckBoxTreeItem<Task>) s).toArray(CheckBoxTreeItem[]::new);
             for (CheckBoxTreeItem<Task> s : tasksItems) {
                 counter += CustomTreeCell.getAnzahlCheckedTasks(s);
-
             }
             return counter;
         } else if (it.isSelected()) return 1;
@@ -77,13 +73,15 @@ class CustomTreeCell extends CheckBoxTreeCell<Task> {
         super.startEdit();
         setText(null);
         setGraphic(myText);
+        myText.requestFocus();
         myText.selectAll();
-
     }
 
     @Override
     public void updateItem(Task task, boolean leer) {
         super.updateItem(task, leer);
+        // change text color based to priority
+        TaskInfoUI.setPriorityColor(getTreeItem(), this);
         if (leer) {
             setText(null);
             setGraphic(null);
@@ -134,9 +132,8 @@ class CustomTreeCell extends CheckBoxTreeCell<Task> {
             }
 
         });
+
         myText.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
                 if (!arg2) {

@@ -56,7 +56,7 @@ public class CreateAccountUI extends Stage {
     }
 
     public void custom(String file) {
-        scene.getStylesheets().add(getClass().getResource(file).toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("css/"+file).toExternalForm());
         ss = file.contains("dark") ? "dark.css" : "light.css";
     }
 

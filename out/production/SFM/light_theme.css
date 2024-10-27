@@ -5,7 +5,7 @@
 
 #mainBox /* Actually the main box*/
 {
-    -fx-font-family: Roboto;
+    -fx-font-family: Cambria;
     -fx-background-color: #f0f0f0;
     -fx-border-radius: 10px;
 
@@ -60,9 +60,10 @@
     -fx-background-color: #7a42f4;
 }
 
-.button:hover {
+.button:hover
+{
     -fx-background-color: #a066ff;
-
+    -fx-font-weight: bolder;
 }
 
 .table-view .column-header {

@@ -30,9 +30,8 @@ final public class ToDoList implements Serializable {
     }
 
     public void show() {
-        Iterator<Task> iterator = todos.iterator();
-        while (iterator.hasNext()) {
-            System.out.println(iterator.next().getBezeichnung());
+        for (Task todo : todos) {
+            System.out.println(todo.getBezeichnung());
         }
     }
 

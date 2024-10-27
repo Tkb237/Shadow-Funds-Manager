@@ -1,5 +1,7 @@
 package geldVerwaltung;
 
+import util.other.Prioritaet;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -172,11 +174,6 @@ public class Konto implements Serializable {
         updateDarlehen(t, bez, bes, betrag, date);
         updateSchuld(t, bez, bes, betrag, date);
     }
-	
-	/*private void show(List<? extends Transaktion> list) 
-	{
-		list.stream().map(Transaktion::toString).forEach(System.out::println);
-	}*/
 
     public float getDarlehen() {
         return darlehen;

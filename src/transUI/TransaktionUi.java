@@ -6,7 +6,7 @@ import geldVerwaltung.Ausgabe;
 import geldVerwaltung.Darlehen;
 import geldVerwaltung.Eingabe;
 import geldVerwaltung.Konto;
-import geldVerwaltung.Prioritaet;
+import util.other.Prioritaet;
 import geldVerwaltung.Schuld;
 import geldVerwaltung.Transaktion;
 import javafx.beans.value.ChangeListener;
@@ -31,28 +31,29 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class TransaktionUi extends Stage {
+    public static final String SRC = "css/";
     private String ss;
-    private StackPane mainBox = new StackPane();
-    private GridPane pane = new GridPane();
+    private final StackPane mainBox = new StackPane();
+    private final GridPane pane = new GridPane();
     //
-    private Label bezeichnung = new Label("Quelle: ");
-    private Label betrag = new Label("Betrag: ");
-    private Label date = new Label("Datum: ");
-    private Label beschreibung = new Label("Beschreibung: ");
-    private Label kategorie = new Label("Kategorie: ");
-    private Label prioritaet = new Label("Priorität: ");
+    private final Label bezeichnung = new Label("Quelle: ");
+    private final Label betrag = new Label("Betrag: ");
+    private final Label date = new Label("Datum: ");
+    private final Label beschreibung = new Label("Beschreibung: ");
+    private final Label kategorie = new Label("Kategorie: ");
+    private final Label prioritaet = new Label("Priorität: ");
     //
-    private TextField bezeichnungField = new TextField();
-    private TextField betragField = new TextField();
-    private DatePicker dateField = new DatePicker(LocalDate.now());
-    private TextArea beschreibungField = new TextArea();
-    private ChoiceBox<String> kategorieField = new ChoiceBox<String>(FXCollections.observableArrayList("Eingabe", "Ausgabe", "Darlehen", "Schuld"));
-    private ChoiceBox<Prioritaet> prioritaetFeld = new ChoiceBox<Prioritaet>(FXCollections.observableArrayList(Prioritaet.Superhoch, Prioritaet.Hoch, Prioritaet.Normal, Prioritaet.Niedrig));
+    private final TextField bezeichnungField = new TextField();
+    private final TextField betragField = new TextField();
+    private final DatePicker dateField = new DatePicker(LocalDate.now());
+    private final TextArea beschreibungField = new TextArea();
+    private final ChoiceBox<String> kategorieField = new ChoiceBox<String>(FXCollections.observableArrayList("Eingabe", "Ausgabe", "Darlehen", "Schuld"));
+    private final ChoiceBox<Prioritaet> prioritaetFeld = new ChoiceBox<Prioritaet>(FXCollections.observableArrayList(Prioritaet.Superhoch, Prioritaet.Hoch, Prioritaet.Normal, Prioritaet.Niedrig));
     //
     HBox btnBox = new HBox();
-    private Button validBtn = new Button("Valid");
-    private Button updateBtn = new Button("Update");
-    private Button abortBtn = new Button("Abort");
+    private final Button validBtn = new Button("Valid");
+    private final Button updateBtn = new Button("Update");
+    private final Button abortBtn = new Button("Abort");
     private Scene scene;
 
     public TransaktionUi(Stage s, Konto k, Transaktion transaktion) {
@@ -64,6 +65,7 @@ public class TransaktionUi extends Stage {
         initOwner(s);
         //getIcons().add(new Image("file:./src/icons/icons8-money-circulation-96.png"));
         getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-money-circulation-96.png").toExternalForm()));
+        setFixedSize();
     }
 
     public TransaktionUi(Stage s, Konto k) {
@@ -72,14 +74,21 @@ public class TransaktionUi extends Stage {
         setTitle("Hinzufügen");
         initModality(Modality.APPLICATION_MODAL);
         initOwner(s);
-        //getIcons().add(new Image("file:./src/icons/icons8-money-circulation-96.png"));
         getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-money-circulation-96.png").toExternalForm()));
-
+        setFixedSize();
     }
 
 
+   private void setFixedSize()
+    {
+        setMaxHeight((float) 488.0);
+        setMinHeight((float) 488.0);
+        setMinWidth((float) 610.0);
+        setMaxWidth((float) 610.0);
+    }
+
     public void custom(String file) {
-        scene.getStylesheets().add(getClass().getResource(file).toExternalForm());
+        scene.getStylesheets().add(getClass().getResource(SRC+file).toExternalForm());
         ss = file.contains("dark") ? "dark.css" : "light.css";
 
     }
@@ -98,6 +107,8 @@ public class TransaktionUi extends Stage {
         prioritaetFeld.getSelectionModel().select(2);
         kategorieField.getSelectionModel().selectFirst();
         prioritaetFeld.setDisable(true);
+
+        beschreibung.setMinWidth(30);
 
         btnBox.getChildren().addAll(validBtn, abortBtn);
         btnBox.setAlignment(Pos.CENTER);
@@ -184,7 +195,8 @@ public class TransaktionUi extends Stage {
                 CustomAlert alert = new CustomAlert(AlertType.INFORMATION, ss);
                 alert.setTitle("Erfolg");
                 alert.setContentText("Erfolgreich hinzugefügt");
-                alert.showAndWait();
+                alert.showTemp();
+
             }
         });
     }

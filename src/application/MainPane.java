@@ -1,34 +1,32 @@
 package application;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import chartUI.BarChartPane;
-import chartUI.GraphShower;
-import chartUI.LineChartPane;
-import chartUI.PieChartDetailPane;
-import chartUI.PieChartPane;
+import chartUI.barChart.BarChartPane;
+import util.viewer.Viewer;
+import chartUI.lineChart.LineChartPane;
+import chartUI.lineChart.LineChartPeriod;
+import chartUI.pieChart.PieChartDetailPane;
+import chartUI.pieChart.PieChartPane;
+import chartUI.pieChart.PieChartPeriod;
 import event.ChartDoubleClickedEvent;
 import event.CusEventTable;
 import event.StateChangedEvent;
 import geldVerwaltung.Konto;
 import geldVerwaltung.Transaktion;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.web.WebView;
+import javafx.scene.chart.Chart;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -36,25 +34,31 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import taskUI.TaskUi;
-import taskUI.TreeViewSaver;
+import util.template.Template;
+import util.other.MonthYear;
+import util.treeViewSaver.TreeViewSaver;
 import taskVerwaltung.Task;
 import taskVerwaltung.Ziel;
 import transUI.CustomAlert;
 import transUI.FieldSet;
 import transUI.TransaktionStack;
+import util.reportGenerator.ReportGenerator;
 
 public class MainPane extends StackPane {
     private static final String FS_PATH = "./conf/fspath.fs";
     private static final String LUF_PATH = "./conf/luf.fs";
+    private static final String VERSION = "1.1.0";
     private CreateAccountUI ca;
     private boolean changed = false; // check if a change occurred in the window (Task, Transactions)
     private VBox leftBox;
     private final HBox topCenterBox = new HBox();
     private final VBox mainVBox = new VBox();
     private final TaskUi rigthBox = new TaskUi();
+    private final WebView vw = new WebView();
     private Konto konto;
     private final FileChooser fs = new FileChooser();
-    private String currentCss = "light_theme.css";
+    private static String currentCss = "light_theme.css"; // the active css style
+    public static String cssForCusAlert = currentCss.replace("_theme","");
     private LineChartPane lineChartPane;
     private PieChartDetailPane pieChartDetailPane;
     private TransaktionStack stack;
@@ -64,8 +68,9 @@ public class MainPane extends StackPane {
     private final HBox mainBox = new HBox();
     private HBox myChartsBox;
     private final Stage myStage;
+    private final Viewer hs; // to show help menu
 
-    private final GraphShower gs;
+    private final Viewer gs; // showing chart
     private final FieldSet[] myFieldSets = new FieldSet[3];
 
     public MainPane(Konto k, Stage s) {
@@ -73,6 +78,7 @@ public class MainPane extends StackPane {
         this.konto = k;
         this.myStage = s;
         this.ca = new CreateAccountUI(myStage);
+        ReportGenerator.setKonto(konto);
         setTitle();
         setUpBar();
         setUp();
@@ -82,7 +88,9 @@ public class MainPane extends StackPane {
         settingStage();
         loadLastUsedFile();
         addChartsEventListener();
-        this.gs = new GraphShower(s);
+        this.gs = new Viewer(s);
+        this.hs = new Viewer(s);
+
     }
 
     private void settingStage() {
@@ -90,7 +98,7 @@ public class MainPane extends StackPane {
         myStage.setOnCloseRequest(event ->
         {
             if (changed) {
-                CustomAlert tAlert = new CustomAlert(AlertType.CONFIRMATION, "light.css");
+                CustomAlert tAlert = new CustomAlert(AlertType.CONFIRMATION, cssForCusAlert);
                 tAlert.getButtonTypes().clear();
                 tAlert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
                 tAlert.setContentText("Do you want to save changes ?");
@@ -161,13 +169,10 @@ public class MainPane extends StackPane {
     private void changeStyle(String pfad, boolean b) {
         // switch between dark and light theme
         currentCss = pfad;
+        cssForCusAlert = currentCss.replace("_theme","");
         myStage.getScene().getStylesheets().clear();
-        myStage.getScene().getStylesheets().add(getClass().getResource(pfad).toExternalForm());
-        try {
-            gs.getScene().getStylesheets().add(getClass().getResource(pfad).toExternalForm());
-        } catch (Exception ignored) {
-            // TODO: handle exception
-        }
+        myStage.getScene().getStylesheets().add(getClass().getResource("css/"+pfad).toExternalForm());
+
         for (FieldSet fSet : myFieldSets) {
             fSet.setCusStyle(b);
         }
@@ -194,15 +199,20 @@ public class MainPane extends StackPane {
         MenuItem saveMenu = new MenuItem("Save", imageViews[1]);
         MenuItem loadMenu = new MenuItem("Load", imageViews[2]);
 
+        newMenu.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+        saveMenu.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+        loadMenu.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
+
+
         fileMenu.getItems().addAll(newMenu, new SeparatorMenuItem(), saveMenu, new SeparatorMenuItem(), loadMenu);
 
         Menu themeMenu = new Menu("Theme");
-        CheckMenuItem darkTheme = new CheckMenuItem("Dark");
+        CheckMenuItem darkMenu = new CheckMenuItem("Dark");
         CheckMenuItem lightMenu = new CheckMenuItem("Light");
 
         lightMenu.setSelected(true);
 
-        themeMenu.getItems().addAll(darkTheme, new SeparatorMenuItem(), lightMenu);
+        themeMenu.getItems().addAll(darkMenu, new SeparatorMenuItem(), lightMenu);
 
         menuBar.getMenus().addAll(fileMenu, themeMenu, moreMenu);
 
@@ -211,16 +221,54 @@ public class MainPane extends StackPane {
 
         //MenuItem settings = new MenuItem("Settings");
         MenuItem infoMenu = new MenuItem("Info");
+        Menu chartsMenu = new Menu("Charts");
+        MenuItem lineChartPeriodMenu = new MenuItem("LC Period");
+        MenuItem pieChartPeriodMenu = new MenuItem("PC Period");
+        MenuItem reportMenu = new MenuItem("Report");
+        MenuItem helpMenu = new MenuItem("Help");
+
+
         //
-        moreMenu.getItems().add(infoMenu);
+        chartsMenu.getItems().addAll(lineChartPeriodMenu, pieChartPeriodMenu);
+        moreMenu.getItems().addAll(chartsMenu, reportMenu,infoMenu, helpMenu);
+        //
+
+        helpMenu.setOnAction(e ->
+        {
+            try {
+                String toShow = Template.help;
+                vw.getEngine().loadContent(toShow);
+                hs.setWidth(400);
+                hs.setContent(vw, "Help" ,"icons8-hilfe-64.png");
+                updateStyleShower();
+            }
+            catch (Exception ignored)
+            {
+
+            }
+        }) ;
+        // generate a report
+        reportMenu.setOnAction(e -> (new ReportGenerator()).generate(MonthYear.from(LocalDate.now())));
+        //
+        lineChartPeriodMenu.setOnAction( event ->
+                {
+                    gs.setContent( new LineChartPeriod(konto));
+                    updateStyleShower();
+                });
+
+        pieChartPeriodMenu.setOnAction( event ->
+        {
+            gs.setContent( new PieChartPeriod(konto));
+            updateStyleShower();
+        });
         // config the behavior in case of a click
         infoMenu.setOnAction(e ->
         {
-                CustomAlert cAlert = new CustomAlert(AlertType.INFORMATION, currentCss);
+                CustomAlert cAlert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
                 cAlert.setTitle("Info");
                 cAlert.setHeaderText("Welcome to");
                 cAlert.getDialogPane().setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-style: italic");
-                cAlert.setContentText("Shadow Funds Manager 1.0.0");
+                cAlert.setContentText("Shadow Funds Manager " + VERSION);
                 cAlert.show();
         });
 
@@ -247,16 +295,24 @@ public class MainPane extends StackPane {
 
         });
 
-        darkTheme.setOnAction(e ->
+        darkMenu.setOnAction(e ->
                 {
-                    changeStyle("dark_theme.css", false);
-                    lightMenu.setSelected(false);
+                    if (darkMenu.isSelected())
+                    {
+                        changeStyle("dark_theme.css", false);
+                        lightMenu.setSelected(false);
+                    }
+                    else darkMenu.setSelected(true);
                 }
         );
         lightMenu.setOnAction(e ->
                 {
-                    changeStyle("light_theme.css", true);
-                    darkTheme.setSelected(false);
+                    if (lightMenu.isSelected())
+                    {
+                        changeStyle("light_theme.css", true);
+                        darkMenu.setSelected(false);
+                    }
+                    else lightMenu.setSelected(true);
                 }
         );
 
@@ -282,15 +338,14 @@ public class MainPane extends StackPane {
                 setTitle();
                 if (!show)
                 {
-                    CustomAlert alert = new CustomAlert(AlertType.INFORMATION, "light.css");
+                    CustomAlert alert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
                     alert.setContentText("Loaded with success");
                     alert.showAndWait();
                 }
-                changed = false;
-
+                updateChanged();
             }
         } catch (StreamCorruptedException e) {
-            CustomAlert alert = new CustomAlert(AlertType.ERROR, "light.css");
+            CustomAlert alert = new CustomAlert(AlertType.ERROR, cssForCusAlert);
             alert.setContentText("Datei nicht geöffnet");
             alert.showAndWait();
         } catch (Exception ignored) {
@@ -313,13 +368,13 @@ public class MainPane extends StackPane {
                 fos.writeObject(saveObjects);
                 saveIdCounter();
                 savePathFileChooser();
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, "light.css");
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
                 saveLastUsedFile(file);
                 alert.setContentText("Saved with sucess ");
                 alert.showAndWait();
-                changed = false;
+                updateChanged();
             } catch (StreamCorruptedException e) {
-                CustomAlert alert = new CustomAlert(AlertType.ERROR, "light.css");
+                CustomAlert alert = new CustomAlert(AlertType.ERROR, cssForCusAlert);
                 alert.setContentText("Datei nicht geöffnet");
                 alert.showAndWait();
             }
@@ -328,13 +383,23 @@ public class MainPane extends StackPane {
 
     }
 
-    private void setUp() {
-        // set tup the main box
+    private void createConfDirectory()
+    {
         File theDir = new File("./conf");
         if (!theDir.exists()) {
             theDir.mkdirs();
             // mask the configuration directory
         }
+        theDir = new File("./report");
+        if (!theDir.exists()) {
+            theDir.mkdirs();
+            // mask the configuration directory
+        }
+    }
+
+    private void setUp() {
+        // set tup the main box
+        createConfDirectory();
         mainVBox.getChildren().addAll(mainBox);
 
         setPrefWidth(Double.MAX_VALUE);
@@ -345,6 +410,7 @@ public class MainPane extends StackPane {
 
         leftBox.setMinWidth(150);
         leftBox.setMaxWidth(150);
+        leftBox.setAlignment(Pos.CENTER);
 
         mainBox.getChildren().addAll(centerBox, rigthBox);
         mainBox.setSpacing(8);
@@ -385,7 +451,7 @@ public class MainPane extends StackPane {
         fs.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save", "*.sfm"));
         //
         addChangeListener();
-
+        //gs.getScene().getStylesheets().add(getClass().getResource("css/"+currentCss).toExternalForm());
     }
 
     private void loadLastUsedFile() {
@@ -471,6 +537,7 @@ public class MainPane extends StackPane {
     }
 
     private void update(Konto k) {
+        ReportGenerator.setKonto(k);
         // update oder reset the main box
         stack.setMyKonto(k);
         stack.getRadioButtons().forEach(e -> {
@@ -512,21 +579,18 @@ public class MainPane extends StackPane {
 
     private void addChartsEventListener() {
         // to open a window if someone double-clicked on the pane
-        lineChartPane.addEventHandler(ChartDoubleClickedEvent.CHART_DB_CLICKED, e ->
+        addEventHandlerToChart(lineChartPane, lineChartPane.getChartCopy());
+        addEventHandlerToChart(pieChartDetailPane, pieChartDetailPane.getChartCopy());
+        addEventHandlerToChart(barChartPane, barChartPane.getChartCopy());
+        addEventHandlerToChart(pieChartPane, pieChartPane.getChartCopy());
+    }
+
+    private void addEventHandlerToChart(Node n, Chart content)
+    {
+        n.addEventHandler(ChartDoubleClickedEvent.CHART_DB_CLICKED, e ->
         {
-            gs.changeChart(lineChartPane.getChartCopy());
-        });
-        pieChartDetailPane.addEventHandler(ChartDoubleClickedEvent.CHART_DB_CLICKED, e ->
-        {
-            gs.changeChart(pieChartDetailPane.getChartCopy());
-        });
-        barChartPane.addEventHandler(ChartDoubleClickedEvent.CHART_DB_CLICKED, e ->
-        {
-            gs.changeChart(barChartPane.getChartCopy());
-        });
-        pieChartPane.addEventHandler(ChartDoubleClickedEvent.CHART_DB_CLICKED, e ->
-        {
-            gs.changeChart(pieChartPane.getChartCopy());
+            gs.setContent(content);
+            updateStyleShower();
         });
     }
 
@@ -534,8 +598,22 @@ public class MainPane extends StackPane {
         myStage.setTitle("ShadowFunds Manager - " + konto.getInhaber());
     }
 
+    private void updateStyleShower()
+    {
+        gs.getScene().getStylesheets().clear();
+        gs.getScene().getStylesheets().add(getClass().getResource("css/"+currentCss).toExternalForm());
+        hs.getScene().getStylesheets().clear();
+        hs.getScene().getStylesheets().add(getClass().getResource("css/"+currentCss).toExternalForm());
+    }
     private void addChangeListener() {
+        // event handler can't use a function that use the same object
         stack.addEventHandler(StateChangedEvent.CHANGED_EVENT_TYPE, e -> changed = true);
         rigthBox.addEventHandler(StateChangedEvent.CHANGED_EVENT_TYPE, e -> changed = true);
+    }
+
+    private void updateChanged()
+    {
+        changed = false;
+        stack.setEmitted(false);
     }
 }
