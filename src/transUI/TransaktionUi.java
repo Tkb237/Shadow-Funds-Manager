@@ -6,6 +6,7 @@ import geldVerwaltung.Ausgabe;
 import geldVerwaltung.Darlehen;
 import geldVerwaltung.Eingabe;
 import geldVerwaltung.Konto;
+import util.cusWidget.CustomAlert;
 import util.other.Prioritaet;
 import geldVerwaltung.Schuld;
 import geldVerwaltung.Transaktion;
@@ -31,8 +32,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class TransaktionUi extends Stage {
-    public static final String SRC = "css/";
-    private String ss;
+    public static final String SRC = "/style/";
     private final StackPane mainBox = new StackPane();
     private final GridPane pane = new GridPane();
     //
@@ -64,7 +64,7 @@ public class TransaktionUi extends Stage {
         initModality(Modality.APPLICATION_MODAL);
         initOwner(s);
         //getIcons().add(new Image("file:./src/icons/icons8-money-circulation-96.png"));
-        getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-money-circulation-96.png").toExternalForm()));
+        getIcons().add(new Image(getClass().getResource("/icons/icons8-money-circulation-96.png").toExternalForm()));
         setFixedSize();
     }
 
@@ -74,7 +74,7 @@ public class TransaktionUi extends Stage {
         setTitle("Hinzufügen");
         initModality(Modality.APPLICATION_MODAL);
         initOwner(s);
-        getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-money-circulation-96.png").toExternalForm()));
+        getIcons().add(new Image(getClass().getResource("/icons/icons8-money-circulation-96.png").toExternalForm()));
         setFixedSize();
     }
 
@@ -89,8 +89,6 @@ public class TransaktionUi extends Stage {
 
     public void custom(String file) {
         scene.getStylesheets().add(getClass().getResource(SRC+file).toExternalForm());
-        ss = file.contains("dark") ? "dark.css" : "light.css";
-
     }
 
     private void loadTransactionUI(Transaktion t) {
@@ -147,14 +145,14 @@ public class TransaktionUi extends Stage {
 
     private boolean checkedInput(String bez, String be) {
         if (bez.isBlank() || bez.isEmpty() || be.isBlank() || be.isEmpty()) {
-            CustomAlert alert = new CustomAlert(AlertType.WARNING, ss);
+            CustomAlert alert = new CustomAlert(AlertType.WARNING);
             alert.setTitle("Fehlende Information");
             alert.setContentText("Das Feld Bezeichnung || Betrag darf nicht leer sein!!! Füllen Sie das Feld aus.");
             alert.showAndWait();
             return false;
         }
         if (!be.matches("[0-9]{1,8}(\\.[0-9]{0,2})?")) {
-            Alert alert = new CustomAlert(AlertType.WARNING, ss);
+            Alert alert = new CustomAlert(AlertType.WARNING);
             alert.setTitle("Decimal Number missing");
             alert.setContentText("Bitte Geben Sie einen gültigen Betrag ein !!!");
             alert.showAndWait();
@@ -192,7 +190,7 @@ public class TransaktionUi extends Stage {
                 if (!beschreibungField.getText().isBlank() && !beschreibungField.getText().isEmpty())
                     k.getTransaktions().get(k.getTransaktions().size() - 1).setBeschreibung(beschreibungField.getText());
 
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, ss);
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setTitle("Erfolg");
                 alert.setContentText("Erfolgreich hinzugefügt");
                 alert.showTemp();
@@ -200,6 +198,8 @@ public class TransaktionUi extends Stage {
             }
         });
     }
+
+
 
     private void abortBtn() {
         abortBtn.setOnAction(e -> close());
@@ -212,7 +212,7 @@ public class TransaktionUi extends Stage {
             String be = betragField.getText();
             if (checkedInput(bez, be)) {
                 k.updateTransaktion(t, bez, beschreibungField.getText(), be, dateField.getValue(), prioritaetFeld.getValue());
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, ss);
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setTitle("Erfolg");
                 alert.setContentText("Erfolgreich updated");
                 alert.showAndWait();

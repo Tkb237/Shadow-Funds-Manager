@@ -13,7 +13,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import transUI.CustomAlert;
+import util.cusWidget.CustomAlert;
+
+import static transUI.TransaktionUi.SRC;
 
 // The window is used to create a new account
 public class CreateAccountUI extends Stage {
@@ -47,7 +49,7 @@ public class CreateAccountUI extends Stage {
         setTitle("New Account");
         initModality(Modality.APPLICATION_MODAL);
         initOwner(s);
-        getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-registration-96.png").toExternalForm()));
+        getIcons().add(new Image(getClass().getResource("/icons/icons8-registration-96.png").toExternalForm()));
         setMinWidth(255);
         setMaxWidth(255);
 
@@ -56,8 +58,8 @@ public class CreateAccountUI extends Stage {
     }
 
     public void custom(String file) {
-        scene.getStylesheets().add(getClass().getResource("css/"+file).toExternalForm());
-        ss = file.contains("dark") ? "dark.css" : "light.css";
+        scene.getStylesheets().add(getClass().getResource(SRC+file).toExternalForm());
+        ss = file.contains("dark") ? "cusAlertDark.css" : "cusAlertLight.css";
     }
 
 
@@ -108,7 +110,7 @@ public class CreateAccountUI extends Stage {
     private boolean checkedInput() {
         // check if all the fields aren't empty and if the amount field contains only number
         if (checkedField(darlehenField) || checkedField(inhaberField) || checkedField(schuldField) || checkedField(saldoField)) {
-            CustomAlert alert = new CustomAlert(AlertType.WARNING, ss);
+            CustomAlert alert = new CustomAlert(AlertType.WARNING);
             alert.setTitle("Fehlende Information");
             alert.setContentText("Das Feld Bezeichnung || Betrag darf nicht leer sein!!! Füllen Sie das Feld aus.");
             alert.showAndWait();
@@ -118,7 +120,7 @@ public class CreateAccountUI extends Stage {
         if (checkedInput(darlehenField) && checkedInput(saldoField) && checkedInput(schuldField)) {
             return true;
         } else {
-            Alert alert = new CustomAlert(AlertType.WARNING, ss);
+            Alert alert = new CustomAlert(AlertType.WARNING);
             alert.setTitle("Decimal Number missing");
             alert.setContentText("Bitte Geben Sie einen gültige Betrage ein !!!");
             alert.showAndWait();
@@ -145,7 +147,7 @@ public class CreateAccountUI extends Stage {
                 float darlehen = Float.parseFloat(darlehenField.getText());
                 float schuld = Float.parseFloat(schuldField.getText());
                 konto = new Konto(saldo, schuld, darlehen, inhaber);
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, ss);
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setTitle("Erfolg");
                 alert.setContentText("Erfolgreich hinzugefügt");
                 alert.showAndWait();

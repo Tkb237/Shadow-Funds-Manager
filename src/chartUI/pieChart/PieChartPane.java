@@ -12,7 +12,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
-import static util.template.Template.df;
+import static util.other.Template.df;
 
 // show the proportions
 public class PieChartPane extends StackPane {

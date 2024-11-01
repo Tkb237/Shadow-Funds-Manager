@@ -28,7 +28,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import static util.template.Template.df;
+import static util.other.Template.df;
 
 // show information monthly
 public class LineChartPeriod extends VBox{

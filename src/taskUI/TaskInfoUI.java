@@ -17,7 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import taskVerwaltung.Task;
 import taskVerwaltung.Ziel;
-import transUI.CustomAlert;
+import util.cusWidget.CustomAlert;
 
 public class TaskInfoUI extends StackPane {
     private final GridPane pane = new GridPane();
@@ -58,11 +58,11 @@ public class TaskInfoUI extends StackPane {
         if (taskItem != null) {
             if (bezeichnungField.getText() == null | bezeichnungField.getText().isBlank()
                     | bezeichnungField.getText().isEmpty()) {
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setContentText("Die Bezeichnung darf nicht leer sein");
                 alert.showAndWait();
             } else if (dateField.getValue().isAfter(dateFieldEndDate.getValue())) {
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setContentText("Das Enddatum muss nach dem Startdatum liegen.");
                 alert.showAndWait();
             } else {

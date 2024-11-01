@@ -34,20 +34,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import taskUI.TaskUi;
-import util.template.Template;
+import util.other.Template;
 import util.other.MonthYear;
 import util.treeViewSaver.TreeViewSaver;
 import taskVerwaltung.Task;
 import taskVerwaltung.Ziel;
-import transUI.CustomAlert;
-import transUI.FieldSet;
+import util.cusWidget.CustomAlert;
+import util.cusWidget.FieldSet;
 import transUI.TransaktionStack;
 import util.reportGenerator.ReportGenerator;
+
+import static transUI.TransaktionUi.SRC;
 
 public class MainPane extends StackPane {
     private static final String FS_PATH = "./conf/fspath.fs";
     private static final String LUF_PATH = "./conf/luf.fs";
-    private static final String VERSION = "1.1.0";
+    private static final String VERSION = "1.2.0";
     private CreateAccountUI ca;
     private boolean changed = false; // check if a change occurred in the window (Task, Transactions)
     private VBox leftBox;
@@ -58,7 +60,6 @@ public class MainPane extends StackPane {
     private Konto konto;
     private final FileChooser fs = new FileChooser();
     private static String currentCss = "light_theme.css"; // the active css style
-    public static String cssForCusAlert = currentCss.replace("_theme","");
     private LineChartPane lineChartPane;
     private PieChartDetailPane pieChartDetailPane;
     private TransaktionStack stack;
@@ -98,7 +99,7 @@ public class MainPane extends StackPane {
         myStage.setOnCloseRequest(event ->
         {
             if (changed) {
-                CustomAlert tAlert = new CustomAlert(AlertType.CONFIRMATION, cssForCusAlert);
+                CustomAlert tAlert = new CustomAlert(AlertType.CONFIRMATION);
                 tAlert.getButtonTypes().clear();
                 tAlert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
                 tAlert.setContentText("Do you want to save changes ?");
@@ -169,9 +170,9 @@ public class MainPane extends StackPane {
     private void changeStyle(String pfad, boolean b) {
         // switch between dark and light theme
         currentCss = pfad;
-        cssForCusAlert = currentCss.replace("_theme","");
+        CustomAlert.setStyle(getCssForCusAlert());
         myStage.getScene().getStylesheets().clear();
-        myStage.getScene().getStylesheets().add(getClass().getResource("css/"+pfad).toExternalForm());
+        myStage.getScene().getStylesheets().add(getClass().getResource(SRC+pfad).toExternalForm());
 
         for (FieldSet fSet : myFieldSets) {
             fSet.setCusStyle(b);
@@ -180,12 +181,17 @@ public class MainPane extends StackPane {
         rigthBox.setTaskInfoStyle(pfad);
     }
 
+    public static String getCssForCusAlert()
+    {
+        return currentCss.contains("dark") ? "cusAlertDark.css" : "cusAlertLight.css";
+    }
+
     private void setUpBar() {
         // config the menu bar
         MenuBar menuBar = new MenuBar();
-        ImageView[] imageViews = {new ImageView(getClass().getClassLoader().getResource("icons8-registration-64.png").toExternalForm()),
-                new ImageView(getClass().getClassLoader().getResource("icons8-save-64.png").toExternalForm()),
-                new ImageView(getClass().getClassLoader().getResource("icons8-load-96.png").toExternalForm())};
+        ImageView[] imageViews = {new ImageView(getClass().getResource("/icons/icons8-registration-64.png").toExternalForm()),
+                new ImageView(getClass().getResource("/icons/icons8-save-64.png").toExternalForm()),
+                new ImageView(getClass().getResource("/icons/icons8-load-96.png").toExternalForm())};
 
         for (ImageView e : imageViews) {
             e.setFitWidth(20);
@@ -264,7 +270,7 @@ public class MainPane extends StackPane {
         // config the behavior in case of a click
         infoMenu.setOnAction(e ->
         {
-                CustomAlert cAlert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
+                CustomAlert cAlert = new CustomAlert(AlertType.INFORMATION);
                 cAlert.setTitle("Info");
                 cAlert.setHeaderText("Welcome to");
                 cAlert.getDialogPane().setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-style: italic");
@@ -338,14 +344,14 @@ public class MainPane extends StackPane {
                 setTitle();
                 if (!show)
                 {
-                    CustomAlert alert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
+                    CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                     alert.setContentText("Loaded with success");
                     alert.showAndWait();
                 }
                 updateChanged();
             }
         } catch (StreamCorruptedException e) {
-            CustomAlert alert = new CustomAlert(AlertType.ERROR, cssForCusAlert);
+            CustomAlert alert = new CustomAlert(AlertType.ERROR);
             alert.setContentText("Datei nicht geöffnet");
             alert.showAndWait();
         } catch (Exception ignored) {
@@ -368,13 +374,13 @@ public class MainPane extends StackPane {
                 fos.writeObject(saveObjects);
                 saveIdCounter();
                 savePathFileChooser();
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, cssForCusAlert);
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 saveLastUsedFile(file);
                 alert.setContentText("Saved with sucess ");
                 alert.showAndWait();
                 updateChanged();
             } catch (StreamCorruptedException e) {
-                CustomAlert alert = new CustomAlert(AlertType.ERROR, cssForCusAlert);
+                CustomAlert alert = new CustomAlert(AlertType.ERROR);
                 alert.setContentText("Datei nicht geöffnet");
                 alert.showAndWait();
             }
@@ -601,9 +607,9 @@ public class MainPane extends StackPane {
     private void updateStyleShower()
     {
         gs.getScene().getStylesheets().clear();
-        gs.getScene().getStylesheets().add(getClass().getResource("css/"+currentCss).toExternalForm());
+        gs.getScene().getStylesheets().add(getClass().getResource(SRC+currentCss).toExternalForm());
         hs.getScene().getStylesheets().clear();
-        hs.getScene().getStylesheets().add(getClass().getResource("css/"+currentCss).toExternalForm());
+        hs.getScene().getStylesheets().add(getClass().getResource(SRC+currentCss).toExternalForm());
     }
     private void addChangeListener() {
         // event handler can't use a function that use the same object
@@ -615,5 +621,9 @@ public class MainPane extends StackPane {
     {
         changed = false;
         stack.setEmitted(false);
+    }
+
+    public static String getCurrentCss() {
+        return currentCss;
     }
 }

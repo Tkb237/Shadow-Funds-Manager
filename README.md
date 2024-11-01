@@ -20,8 +20,10 @@ It also includes a **Task Manager** to help manage tasks and objectives, with vi
 Project is created with:
 * Java version 20.0.2
 * JavaFX version 21.0.4
+* VertexAI from Google
 * html
 * css
+
 
 ### Key Features:
 
@@ -32,7 +34,8 @@ Project is created with:
   - The "Add to TreeView" button allows tasks to be added directly to the root of the tree.
 
 - **Report Generation**:
-  - The **Report** button generates a monthly report in `.html` format, stored in the `report` folder.
+    - With the help of Google's artificial intelligence, you receive personalized advice and a summary. 
+    - The **Report** button generates a monthly report in `.html` format, stored in the `report` folder.
 
 - **Dynamic Charts**:
   - Charts adapt to user needs, including the **PC Period** chart, accessible via `More -> Charts -> PC Period`.
@@ -45,7 +48,13 @@ Project is created with:
 
 ### Installation and Execution (Without Maven/Gradle)
 
-* Information on installing, configuring, and running this program with an IDE is available on (Getting Started with JavaFX)[https://openjfx.io/openjfx-docs/] 
+* Information on installing, configuring, and running this program with an IDE is available on [Getting Started with JavaFX](https://openjfx.io/openjfx-docs/)
+* To install bibliothek you can use IntelliJ
+  * `Project Structure -> Libraries ->` `+` `-> From Maven`
+    * Maven coordinates for JavaFX Web 21.0.3 `org.openjfx:javafx-web:21.0.3`
+    * Maven coordinates for JavaFX Controls 21.0.3 `org.openjfx:javafx-controls:21.0.3`
+    * Maven coordinates for Google VertexAI API 1.6.0  `com.google.cloud:google-cloud-vertexai:1.6.0`
+  
 * Executable files stored in the folder `Releases`
 * Jar files stored in `out\artifacts\SFM_jar`
 
@@ -64,6 +73,7 @@ Project is created with:
 - Icons(gradient): [Icons8](https://icons8.com)
 - Logo: [Flaticon](https://www.flaticon.com)
 - Launch4j: [Launch4j.sourceforge.net](https://launch4j.sourceforge.net/)
+- Vertex AI SDK: [Java-VertexAI](https://github.com/googleapis/google-cloud-java/tree/main/java-vertexai)
 
 ---
 

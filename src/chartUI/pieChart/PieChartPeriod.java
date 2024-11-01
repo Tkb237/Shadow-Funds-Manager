@@ -1,6 +1,5 @@
 package chartUI.pieChart;
 
-import application.MainPane;
 import geldVerwaltung.Konto;
 import geldVerwaltung.Transaktion;
 import javafx.collections.ObservableList;
@@ -13,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import transUI.CustomAlert;
 import util.other.MonthYear;
 import util.reportGenerator.ReportGenerator;
 
@@ -102,8 +100,7 @@ public class PieChartPeriod extends VBox
         getChildren().addAll(container, theChart.getMyPieChart(), reportButton);
         confRadioButtonPieChart();
 
-        reportButton.setStyle("-fx-background-color: orangered; -fx-font-size: 150%;");
-
+        reportButton.setId("report");
         reportButton.setOnAction( e ->
         {
             ReportGenerator rg = new ReportGenerator();

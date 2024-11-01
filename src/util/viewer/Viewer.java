@@ -13,7 +13,7 @@ public class Viewer extends Stage {
     public Viewer(Stage s) {
         Scene scene = new Scene(pane);
         setScene(scene);
-        getIcons().add(new Image(getClass().getClassLoader().getResource("icons8-graph-64.png").toExternalForm()));
+        getIcons().add(new Image(getClass().getResource("/icons/icons8-graph-64.png").toExternalForm()));
         setTitle("Graph Viewer");
         setOnCloseRequest(e -> pane.getChildren().clear());
         pane.setId("mainBoxGS");
@@ -31,7 +31,7 @@ public class Viewer extends Stage {
     public void setContent(Node n, String title, String icon)
     {
         getIcons().clear();
-        getIcons().add(new Image(getClass().getClassLoader().getResource(icon).toExternalForm()));
+        getIcons().add(new Image(getClass().getResource("/icons/"+icon).toExternalForm()));
         setTitle(title);
         setContent(n);
     }

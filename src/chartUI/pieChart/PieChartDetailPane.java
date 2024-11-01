@@ -6,8 +6,6 @@ import java.util.TreeSet;
 import event.ChartDoubleClickedEvent;
 import geldVerwaltung.Konto;
 import geldVerwaltung.Transaktion;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Side;
@@ -15,14 +13,13 @@ import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import static util.template.Template.df;
+import static util.other.Template.df;
 
 //show proportions for every category
 public class PieChartDetailPane extends VBox {

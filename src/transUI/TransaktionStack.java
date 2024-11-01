@@ -5,10 +5,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import application.MainPane;
 import event.CusEventTable;
 import event.StateChangedEvent;
 import geldVerwaltung.Eingabe;
 import geldVerwaltung.Konto;
+import util.cusWidget.CustomAlert;
 import util.other.Prioritaet;
 import geldVerwaltung.Transaktion;
 import javafx.beans.property.SimpleObjectProperty;
@@ -27,9 +29,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import util.template.Template;
 
-import static util.template.Template.df;
+import static util.other.Template.df;
 
 public class TransaktionStack extends StackPane {
     private String pfadCss = "light_theme.css";
@@ -100,11 +101,11 @@ public class TransaktionStack extends StackPane {
             String[] IDs = (myKonto.getTransaktions().stream().map(Transaktion::getiD).toArray(String[]::new));
             /* ****************************************************************************************/
             ChoiceDialog<String> diag = new ChoiceDialog<String>(IDs[0], IDs);
-            String iconPfad = getClass().getClassLoader().getResource("icons8-select-64.png").toExternalForm();
+            String iconPfad = getClass().getResource("/icons/icons8-select-64.png").toExternalForm();
             Stage stage = (Stage) diag.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(iconPfad));
             diag.getDialogPane().getStylesheets().add(getClass().getResource
-                    (TransaktionUi.SRC + pfadCss.replace("_theme", "")).toExternalForm());
+                    (TransaktionUi.SRC + MainPane.getCssForCusAlert()).toExternalForm());
             /* ****************************************************************************************/
             Optional<String> result = diag.showAndWait();
             return result.orElse("1");
@@ -112,6 +113,12 @@ public class TransaktionStack extends StackPane {
             return "1";
         }
 
+
+    }
+
+    private String getPfadCssFor()
+    {
+        return pfadCss.contains("dark") ? "cusAlertDark.css" : "cusAlertLight.css";
 
     }
 
@@ -142,7 +149,7 @@ public class TransaktionStack extends StackPane {
                 fireEvent(new CusEventTable(CusEventTable.REMOVE_EVENT_TYPE));
             }
             if (myKonto.getTransaktions().isEmpty()) {
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setContentText("Keine Transaktion vorhanden");
                 alert.show();
             }
@@ -164,7 +171,7 @@ public class TransaktionStack extends StackPane {
                 fireEvent(new CusEventTable(CusEventTable.UPDATE_EVENT_TYPE));
             }
             if (myKonto.getTransaktions().isEmpty()) {
-                CustomAlert alert = new CustomAlert(AlertType.INFORMATION, pfadCss.replace("_theme", ""));
+                CustomAlert alert = new CustomAlert(AlertType.INFORMATION);
                 alert.setContentText("Keine Transaktion vorhanden");
                 alert.show();
             }

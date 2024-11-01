@@ -1,0 +1,41 @@
+<component name="libraryTable">
+  <library name="openjfx.javafx.web" type="repository">
+    <properties maven-id="org.openjfx:javafx-web:21.0.4" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4-win.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-web/21.0.4/javafx-web-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.4/javafx-controls-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/21.0.4/javafx-graphics-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-base/21.0.4/javafx-base-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.4/javafx-media-21.0.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

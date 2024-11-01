@@ -5,8 +5,9 @@ import geldVerwaltung.Transaktion;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import transUI.CustomAlert;
-import util.template.Template;
+import util.cusWidget.CustomAlert;
+import util.ai.GeminiVertexAI;
+import util.other.Template;
 import util.other.MonthYear;
 
 import java.io.File;
@@ -18,11 +19,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static application.MainPane.cssForCusAlert;
 
 public class ReportGenerator extends Node
 {
     private static Konto konto;
+    private static Boolean occupied = false;
 
     private static String[] generateTable(Object o)
     {
@@ -51,11 +52,13 @@ public class ReportGenerator extends Node
     {
         List<? extends Transaktion> listNull = new ArrayList<>();
         if(o instanceof MonthYear my)
-        return list.stream().
-                filter(transaktion -> MonthYear.from(transaktion.getDate()).equals(my)).toList();
+        return list.stream()
+            .filter(transaktion -> MonthYear.from(transaktion.getDate()).equals(my))
+                .sorted(Comparator.comparing((Transaktion a) -> a.getDate())).toList();
         else if(o instanceof Year year)
             return list.stream().
-                    filter(transaktion -> transaktion.getDate().getYear() == year.getValue()).toList();
+                    filter(transaktion -> transaktion.getDate().getYear() == year.getValue())
+                    .sorted(Comparator.comparing((Transaktion a) -> a.getDate())).toList();
         return listNull;
     }
 
@@ -74,11 +77,23 @@ public class ReportGenerator extends Node
     }
 
 
-    public void generate(Object o)
-    {
-        Thread th = new Thread(() -> generateReport(o));
-        th.start();
+    public void generate(Object o){
+
+        if(!occupied)
+        {
+            Thread th = new Thread(() ->
+            {
+                synchronized (occupied)
+                {
+                    occupied = true;
+                    generateReport(o);
+                    occupied = false;
+                }
+            });
+            th.start();
+        }
     }
+
 
     private void generateReport(Object o)
     {
@@ -99,6 +114,7 @@ public class ReportGenerator extends Node
 
             files = files.replace("$schuld_summe", getSumme(konto.getSchuldenList(), o));
             files = files.replace("$schuld_data", erg[3]);
+            files = files.replace("$tipp", generateSummaryIA(o));
 
             String path = "./report/Report_"+dateToString(o).replace(" ","_")+".html";
             File f = new File(path.toUpperCase());
@@ -106,7 +122,7 @@ public class ReportGenerator extends Node
 
             Platform.runLater(() ->
             {
-                CustomAlert cs = new CustomAlert(Alert.AlertType.INFORMATION,cssForCusAlert);
+                CustomAlert cs = new CustomAlert(Alert.AlertType.INFORMATION);
                 cs.setContentText("Report of " + dateToString(o) + " was generated.");
                 cs.show();
             });
@@ -117,6 +133,20 @@ public class ReportGenerator extends Node
         }
     }
 
+    private String generateSummaryIA(Object o)
+    {
+        String message = "4 Kategorien (Eingabe, Ausgabe, Darlehen(ich bin der Kreditgeber)," +
+                " Schuld(ich bin der Kredit nehmer). detaillierte Zusammenfassung ohne Liste und " +
+                "tipp zur Verbesserung der Finanzen in einem Html Absatz . \n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(message);
+        sb.append("Bezeichnung | Kategorie | Datum | Betrag\n");
+        getMatchingList(konto.getTransaktions(),o).stream().sorted(Comparator.comparing((Transaktion a) -> a.getDate()))
+                .forEach(t -> sb.append("\"").append(t.getBezeichnung()).append("\"").append(" ")
+                .append(t.getClass().getSimpleName()).append(" ").append(t.getDate()).append(" ")
+                .append(String.valueOf(t.getBetrag()).replace(".", ",")).append("$ \n"));
+        return GeminiVertexAI.generate(sb.toString());
+    }
 
     private static String getSumme(List<? extends Transaktion> list, Object o)
     {

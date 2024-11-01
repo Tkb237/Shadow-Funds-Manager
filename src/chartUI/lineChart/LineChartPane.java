@@ -24,7 +24,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import util.template.Template;
+import util.other.Template;
 
 // show information monthly
 public class LineChartPane extends StackPane {
