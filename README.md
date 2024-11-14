@@ -21,8 +21,8 @@ Project is created with:
 * Java version 20.0.2
 * JavaFX version 21.0.4
 * VertexAI from Google
-* html
-* css
+* HTML
+* CSS
 
 
 ### Key Features:
